@@ -77,7 +77,7 @@ void open_menu_from_another_instance()
     PostMessageW(hwnd_main, WM_COMMAND, ID_SETTINGS_MENU_COMMAND, 0);
 }
 
-int runner(bool isProcessElevated)
+int runner(bool isProcessElevated, bool openSettings)
 {
     std::filesystem::path logFilePath(PTSettingsHelper::get_root_save_folder_location());
     logFilePath.append(LogSettings::runnerLogPath);
@@ -155,6 +155,11 @@ int runner(bool isProcessElevated)
         start_initial_powertoys();
 
         Trace::EventLaunch(get_product_version(), isProcessElevated);
+
+        if (openSettings)
+        {
+            open_settings_window();
+        }
 
         result = run_message_loop();
     }
@@ -411,9 +416,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         const bool elevated = is_process_elevated();
         if ((elevated ||
              general_settings.GetNamedBoolean(L"run_elevated", false) == false ||
-             strcmp(lpCmdLine, "--dont-elevate") == 0))
+             strcmp(lpCmdLine, "--dont-elevate") >= 0))
         {
-            result = runner(elevated);
+            bool openSettings = strcmp(lpCmdLine, "--open-settings") >= 0;
+            result = runner(elevated, openSettings);
         }
         else
         {

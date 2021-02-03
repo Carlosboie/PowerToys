@@ -35,7 +35,7 @@ bool restart_if_scheduled()
     switch (state)
     {
     case RestartAsElevated:
-        return run_elevated(exe_path.get(), {});
+        return run_elevated(exe_path.get(), L"--open-settings");
     case RestartAsNonElevated:
         return run_non_elevated(exe_path.get(), L"--dont-elevate", NULL);
     default:
